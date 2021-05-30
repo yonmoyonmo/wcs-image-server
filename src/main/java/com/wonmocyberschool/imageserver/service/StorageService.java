@@ -27,6 +27,19 @@ public class StorageService {
         this.uploadPath = fileStorageProperties.getUploadDir();
     }
 
+    private String getRandomStr(){
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+        Random random = new Random();
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        System.out.println("random : " + generatedString);
+        return generatedString;
+    }
+
     public String saveFile(MultipartFile file, String userName) throws IOException {
 
         String randomStr = getRandomStr();
@@ -41,22 +54,24 @@ public class StorageService {
         try (InputStream inputStream = file.getInputStream()) {
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-            return filePath.toString();
+            return fileName;
         } catch (IOException ioe) {
             throw new IOException("Could not save image file: " + fileName, ioe);
         }
     }
 
-    private String getRandomStr(){
-        int leftLimit = 97; // letter 'a'
-        int rightLimit = 122; // letter 'z'
-        int targetStringLength = 10;
-        Random random = new Random();
-        String generatedString = random.ints(leftLimit, rightLimit + 1)
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
-        System.out.println("random : " + generatedString);
-        return generatedString;
+    public Resource loadFileAsResource(String userName, String fileName) {
+        Path uploadPath = Paths.get(this.uploadPath+"/"+userName);
+        try {
+            Path filePath = uploadPath.resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if(resource.exists()) {
+                return resource;
+            } else {
+                throw new MyFileNotFoundException("File not found " + fileName);
+            }
+        } catch (MalformedURLException ex) {
+            throw new MyFileNotFoundException("File not found " + fileName, ex);
+        }
     }
 }
