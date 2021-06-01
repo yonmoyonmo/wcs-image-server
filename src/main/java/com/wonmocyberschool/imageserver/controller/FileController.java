@@ -1,8 +1,7 @@
 package com.wonmocyberschool.imageserver.controller;
 
-import com.wonmocyberschool.imageserver.DTO.ResponseDTO;
+import com.wonmocyberschool.imageserver.payload.ResponseDTO;
 import com.wonmocyberschool.imageserver.service.StorageService;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 
 @RestController

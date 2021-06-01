@@ -1,6 +1,6 @@
-package com.wonmocyberschool.imageserver.DTO;
+package com.wonmocyberschool.imageserver.payload;
 
-public class ResponseDTO {
+public class Response {
     private String message;
     private String imageLocation;
 
