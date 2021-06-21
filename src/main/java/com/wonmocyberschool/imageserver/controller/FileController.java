@@ -1,6 +1,6 @@
 package com.wonmocyberschool.imageserver.controller;
 
-import com.wonmocyberschool.imageserver.payload.ResponseDTO;
+import com.wonmocyberschool.imageserver.payload.Response;
 import com.wonmocyberschool.imageserver.service.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +30,18 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<ResponseDTO> uploadImage(@RequestParam("file") MultipartFile file,
-                                                   @RequestParam("userName") String userName) throws IOException {
-        ResponseDTO res = new ResponseDTO();
-        String result = storageService.saveFile(file, userName);
-        res.setImageLocation("/"+userName+"/"+result);
-        res.setMessage("done");
-        return new ResponseEntity<ResponseDTO>(res, HttpStatus.OK);
+    public ResponseEntity<Response> uploadImage(@RequestParam("file") MultipartFile file,
+                                                @RequestParam("userName") String userName) throws IOException {
+        Response res = new Response();
+        try{
+            String result = storageService.saveFile(file, userName);
+            res.setImageLocation("/"+userName+"/"+result);
+            res.setMessage("done");
+            return new ResponseEntity<Response>(res, HttpStatus.OK);
+        }catch (Exception e){
+            res.setMessage("failed");
+            return new ResponseEntity<Response>(res, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/display/{userName}/{fileName:.+}")
