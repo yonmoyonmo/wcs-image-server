@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -40,6 +42,28 @@ public class StorageService {
         return generatedString;
     }
 
+    public List<String> saveFiles(MultipartFile[] files, String postName) throws IOException {
+        String randomStr = getRandomStr();
+        List<String> fileNames = new ArrayList<>();
+        for(MultipartFile file : files) {
+            fileNames.add(randomStr + StringUtils.cleanPath(file.getOriginalFilename()));
+        }
+        Path uploadPath = Paths.get(this.uploadPath+"/"+postName);
+        if(!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+            System.out.println("make dir : " + uploadPath.toString());
+        }
+        for(int i =0; i< files.length; i++) {
+            try (InputStream inputStream = files[i].getInputStream()) {
+                Path filePath = uploadPath.resolve(fileNames.get(i));
+                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException ioe) {
+                throw new IOException("Could not save image file: " + fileNames.get(i), ioe);
+            }
+        }
+        return fileNames;
+    }
+
     public String saveFile(MultipartFile file, String userName) throws IOException {
 
         String randomStr = getRandomStr();
@@ -48,7 +72,6 @@ public class StorageService {
         Path uploadPath = Paths.get(this.uploadPath+"/"+userName);
         if(!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
-            System.out.println("make dir : " + uploadPath.toString());
         }
 
         try (InputStream inputStream = file.getInputStream()) {
