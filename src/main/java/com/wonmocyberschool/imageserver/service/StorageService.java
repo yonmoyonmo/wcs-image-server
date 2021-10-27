@@ -46,7 +46,11 @@ public class StorageService {
         String randomStr = getRandomStr();
         List<String> fileNames = new ArrayList<>();
         for(MultipartFile file : files) {
-            fileNames.add(randomStr + StringUtils.cleanPath(file.getOriginalFilename().substring(0,10)));
+            String filename = randomStr + StringUtils.cleanPath(file.getOriginalFilename());
+            if(filename.length() > 30){
+                filename.substring(0,30);
+            }
+            fileNames.add(filename);
         }
         Path uploadPath = Paths.get(this.uploadPath+"/"+postName);
         if(!Files.exists(uploadPath)) {
